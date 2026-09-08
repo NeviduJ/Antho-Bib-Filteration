@@ -1,4 +1,4 @@
-# filter-bib
+# anthology-bib-filter
 
 Built to solve one specific problem: the [ACL Anthology](https://aclanthology.org/)
 publishes its entire bibliography as `anthology.bib` — split into shards
