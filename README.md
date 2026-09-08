@@ -31,6 +31,13 @@ duplicate is removed from every later file, whether or not that file is one
 of the `--bib` primaries. Files outside this discovered set are left alone
 unless you pass them to `--bib` explicitly.
 
+> **Using biblatex instead of BibTeX?** Auto-discovery only understands the
+> classic `\bibliography{...}` command. If your project uses biblatex's
+> `\addbibresource{...}` (typically with `\usepackage{biblatex}`), pass every
+> `.bib` file explicitly to `--bib` instead of relying on discovery — see
+> [Manually listing bib files](#manually-listing-bib-files-biblatex-or-otherwise)
+> below.
+
 No third-party dependencies. Requires Python 3.7+.
 
 ## Usage
@@ -49,6 +56,24 @@ python3 filter_bib.py --tex paper.tex --bib anthology-1.bib anthology-2.bib
 # Point it at extra .tex files explicitly too, if you want
 python3 filter_bib.py --tex paper.tex tables/extra.tex --bib references.bib
 ```
+
+### Manually listing bib files (biblatex or otherwise)
+
+If your project uses biblatex's `\addbibresource{...}` rather than
+`\bibliography{...}`, auto-discovery won't find your bib files — pass every
+one of them to `--bib` explicitly instead:
+
+```bash
+python3 filter_bib.py --tex paper.tex \
+  --bib references.bib extra-refs.bib
+```
+
+Every file passed to `--bib` is treated as primary: each is trimmed down to
+cited-only entries, and duplicate keys across the whole set you listed are
+removed (keeping the copy in whichever file you passed first). There's
+currently no way to include a file for deduplication *without* also
+trimming it unless it's picked up via `\bibliography{...}` discovery — so
+in biblatex/manual mode, only pass files you're happy to have trimmed.
 
 ### Options
 
