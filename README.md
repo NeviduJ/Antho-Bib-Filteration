@@ -53,7 +53,8 @@ python3 filter_bib.py --tex paper.tex tables/extra.tex --bib references.bib
 ### Options
 
 - `--dry-run` — report what would change without writing anything.
-- `--no-backup` — skip saving a backup before overwriting a `.bib` file.
+- `--backup` — save a `<name>.orig.bib` backup before overwriting a `.bib`
+  file (off by default).
 - `--no-follow-inputs` — scan only the file(s) passed to `--tex`, without
   following `\input`/`\include`.
 - `--no-dedupe` — don't look for `\bibliography{...}` or remove duplicate
@@ -84,9 +85,9 @@ python3 filter_bib.py --tex paper.tex --bib references.bib
    first one that defines it — including non-primary files, if that's
    where the duplicate lives.
 5. Writes back: primary files are always (re)written; non-primary files are
-   only touched if a duplicate was actually removed from them. Every file
-   the script writes to gets a `<name>.orig.bib` backup first (skipped if
-   that backup already exists, or with `--no-backup`).
+   only touched if a duplicate was actually removed from them. No backup is
+   made unless you pass `--backup`, in which case each file written to gets
+   a `<name>.orig.bib` copy first (skipped if that backup already exists).
 6. Reports any cited key that wasn't found in *any* scanned `.bib` file —
    that usually means a typo in the key, and the script exits with status 1
    in that case.

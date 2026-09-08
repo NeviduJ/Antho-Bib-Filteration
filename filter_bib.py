@@ -34,12 +34,13 @@ Usage:
     python3 filter_bib.py --tex paper.tex --bib references.bib
     python3 filter_bib.py --tex paper.tex --bib anthology-1.bib anthology-2.bib
     python3 filter_bib.py --dry-run --tex paper.tex --bib references.bib
-    python3 filter_bib.py --no-backup --tex paper.tex --bib references.bib
+    python3 filter_bib.py --backup --tex paper.tex --bib references.bib
     python3 filter_bib.py --no-dedupe --tex paper.tex --bib references.bib
 
-By default, every .bib file this script writes to is backed up next to it
-first, as "<name>.orig.bib" (skipped if that backup already exists, so
-re-running the script never clobbers your real original).
+Files are overwritten in place with no backup by default. Pass --backup to
+save a copy of each file this script writes to, next to it, as
+"<name>.orig.bib" (skipped if that backup already exists, so re-running
+with --backup never clobbers a backup from an earlier run).
 
 Requires Python 3.7+. No third-party dependencies.
 """
@@ -231,8 +232,9 @@ def main():
     parser.add_argument("--no-dedupe", action="store_true",
                          help="Don't look for \\bibliography{...} or remove duplicate keys "
                               "across bib files; only trim the --bib files given")
-    parser.add_argument("--no-backup", action="store_true",
-                         help="Don't save a .orig.bib backup before overwriting a .bib file")
+    parser.add_argument("--backup", action="store_true",
+                         help="Save a .orig.bib backup before overwriting a .bib file "
+                              "(off by default)")
     parser.add_argument("--dry-run", action="store_true",
                          help="Report what would change without writing anything")
     args = parser.parse_args()
@@ -331,9 +333,9 @@ def main():
 
         if is_primary or changed:
             if not args.dry_run and changed:
-                write_bib(bib_path, items, make_backup=not args.no_backup)
+                write_bib(bib_path, items, make_backup=args.backup)
             verb = "would keep" if args.dry_run else "kept"
-            backup_note = "" if args.dry_run or args.no_backup or not changed else \
+            backup_note = "" if args.dry_run or not args.backup or not changed else \
                 f"; backup saved as {bib_path.stem}.orig.bib"
             role = "" if is_primary else " (dedupe only)"
             print(f"{bib_path.name}{role}: {total} entries -> {verb} {kept} "
