@@ -1,11 +1,20 @@
 # filter-bib
 
-A small script that strips `.bib` files down to only the entries actually
-cited in a LaTeX paper, and removes duplicate entries across every
-bibliography file the paper uses. Useful when you're working from a giant
-shared bibliography (e.g. the [ACL Anthology](https://aclanthology.org/)
-`.bib` shards, which run tens of thousands of entries) but your paper only
-cites a handful of them.
+Built to solve one specific problem: the [ACL Anthology](https://aclanthology.org/)
+publishes its entire bibliography as `anthology.bib` — split into shards
+(`anthology-1.bib`, `anthology-2.bib`, ...) that each run tens of thousands
+of entries and tens of megabytes — and the standard advice for
+ACL/EMNLP/LREC-style papers is to drop the whole thing straight into your
+project and `\bibliography{anthology-1, anthology-2, ...}` it. That works,
+but it means carrying around a 50MB+ file in your repo/submission to cite
+maybe a dozen papers.
+
+This script strips those `.bib` files down to only the entries your paper
+actually cites, and removes duplicate entries across every bibliography
+file the paper uses (e.g. a reference you also copied into a `custom.bib`
+that turns out to already be in the Anthology). It isn't Anthology-specific
+under the hood — it works on any `.bib` file — but that's the problem it
+was written for.
 
 It scans your `.tex` file for `\cite`, `\citet`, `\citep`, `\citealt`, and
 other natbib/biblatex-style citation commands — including comma-separated
