@@ -49,11 +49,18 @@ import re
 import sys
 from pathlib import Path
 
-CITE_RE = re.compile(r'\\[A-Za-z]*[Cc]ite[A-Za-z]*\*?(?:\s*\[[^\]]*\])*\{([^}]*)\}')
+CITE_RE = re.compile(r'\\([A-Za-z]*[Cc]ite[A-Za-z]*)\*?(?:\s*\[[^\]]*\])*\{([^}]*)\}')
 INPUT_RE = re.compile(r'\\(?:input|include)\{([^}]+)\}')
 BIBLIOGRAPHY_RE = re.compile(r'\\bibliography\{([^}]*)\}')
 ENTRY_START_RE = re.compile(r'@(\w+)\{')
 KEY_RE = re.compile(r'@\w+\{\s*([^,\s}]+)\s*[,}]')
+
+# Citation commands whose keys live in a *different* declared bibliography
+# than \bibliography{...} (e.g. LREC's \citelanguageresource family, which
+# cites \bibliographylanguageresource{...} instead) are not "used" as far
+# as the --bib files given here are concerned, and must be excluded or
+# their keys would be wrongly reported as missing.
+CITE_CMD_EXCLUDE_RE = re.compile(r'languageresource', re.IGNORECASE)
 
 
 def strip_comments(text: str) -> str:
@@ -111,7 +118,10 @@ def extract_used_keys(tex_files) -> set:
     for tex_path in tex_files:
         text = strip_comments(tex_path.read_text(encoding="utf-8", errors="replace"))
         for match in CITE_RE.finditer(text):
-            for key in match.group(1).split(","):
+            cmd, key_list = match.group(1), match.group(2)
+            if CITE_CMD_EXCLUDE_RE.search(cmd):
+                continue
+            for key in key_list.split(","):
                 key = key.strip()
                 if key:
                     keys.add(key)
